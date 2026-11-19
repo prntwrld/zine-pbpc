@@ -121,7 +121,7 @@ function page(i,iss,k){let h="",room=true,cls="pg";
     if(Math.random()<.5){h+=sc(photo(),n(22,34),n(22,32),n(40,50),n(-8,8),11)}else{h+=sc(stamp(),n(26,36),n(32,40),n(22,30),n(-10,10),11)}
     h+=sc(EYE+"sleepyeye press",86,8,82,0,10,"text-align:right;letter-spacing:1px;color:var(--ink-2)")}
   else{ // INSIDE PAGES
-    if(k==="poem"){room=false;h+=sc("Commencement",9,10,80,0,16,"font-family:'UnifrakturMaguntia',serif;color:var(--ink-2)");h+=sc("",21,10,22,0,11,"border-top:1px solid currentColor");h+=sc(poem(),26,10,82,0,10,"font-family:var(--serif);font-style:italic;line-height:1.5");h+=sc(take("SO"),80,10,80,0,9,"color:var(--ink-2)")}
+    if(k==="poem"){room=false;h+=sc("Commencement",9,10,80,0,16,"font-family:'UnifrakturMaguntia',serif;color:var(--ink-2)");h+=sc("",20,10,22,0,11,"border-top:1px solid currentColor");h+=sc(poem()+`<div style="margin-top:1.4em;font-family:var(--mono);font-style:normal;font-size:.9em;color:var(--ink-2)">${take("SO")}</div>`,24,10,82,0,9,"font-family:var(--serif);font-style:italic;line-height:1.45")} // sign-off flows under the poem so they can't overlap
     if(k==="photo"){h+=sc(photo(),n(8,20),n(5,15),n(70,85),n(-8,8),11);h+=sc("<i>"+take("C")+"</i>",n(65,78),n(10,40),55,n(-4,4),11);room=false}
     if(k==="head"){h+=sc(take("H"),n(10,35),8,84,n(-6,6),n(16,22),"font-weight:500")}
     if(k==="line"){h+=sc(take("L"),n(15,45),n(8,15),75,n(-5,5),13)}
