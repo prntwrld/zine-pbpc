@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Poverty Bay Pioneers Club — Official Bulletin</title>
 <link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap" rel="stylesheet">
 <style>
@@ -17,19 +17,23 @@
          --page-bg:#1a1a18; --photo-bg:#33332f; --rule:#5f5e5a; }
 }
 *{box-sizing:border-box}
-body{margin:0;background:var(--page-bg);color:var(--ink);font-family:var(--mono)}
-main{max-width:760px;margin:0 auto;padding:24px 16px 48px}
-.bar{display:flex;align-items:center;gap:12px;margin:0 0 16px}
-button{font:inherit;font-size:14px;color:var(--ink);background:transparent;border:1px solid var(--ink-2);border-radius:8px;padding:8px 14px;cursor:pointer}
+html,body{height:100%}
+body{margin:0;background:var(--page-bg);color:var(--ink);font-family:var(--mono);overflow:hidden}
+/* one screen, no scrolling: bar on top, the zine fills whatever is left */
+main{height:100vh;height:100dvh;display:flex;flex-direction:column;
+  padding:max(10px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(10px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left))}
+.bar{display:flex;align-items:center;justify-content:center;gap:12px;margin:0 0 10px;flex:none}
+button{font:inherit;font-size:14px;color:var(--ink);background:transparent;border:1px solid var(--ink-2);border-radius:8px;padding:6px 14px;cursor:pointer}
 button:active{transform:scale(.98)}
 #meta{font-size:13px;color:var(--ink-2)}
-.zg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-@media (min-width:640px){.zg{grid-template-columns:repeat(4,minmax(0,1fr))}}
-.pg{position:relative;aspect-ratio:3/4;background:var(--paper);border:1px solid var(--rule);overflow:hidden;color:var(--ink)}
+#stage{flex:1;min-height:0;display:grid;place-items:center}
+.zg{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+/* text sizes are in cqw so everything scales with the page size */
+.pg{position:relative;aspect-ratio:3/4;background:var(--paper);border:1px solid var(--rule);overflow:hidden;color:var(--ink);container-type:inline-size}
 .cv{border:3px double var(--ink)}
-.pn{position:absolute;bottom:4px;right:6px;font-size:11px;color:var(--ink-3)}
+.pn{position:absolute;bottom:2cqw;right:3cqw;font-size:6.3cqw;color:var(--ink-3)}
 .sc{position:absolute;line-height:1.2}
-@media print{.bar{display:none}body{background:#fff}}
+@media print{.bar{display:none}body{background:#fff;overflow:visible}main{height:auto}}
 </style>
 </head>
 <body>
@@ -38,7 +42,7 @@ button:active{transform:scale(.98)}
   <button id="go">↻ New issue</button>
   <span id="meta"></span>
 </div>
-<div class="zg" id="z"></div>
+<div id="stage"><div class="zg" id="z"></div></div>
 </main>
 <script>
 // ---------- STAMPS (simple silhouettes, 40x40) ----------
@@ -56,7 +60,7 @@ fern:'<path d="M20 37 Q22 20 16 4" stroke="currentColor" stroke-width="1.5" fill
 corgi:'<ellipse cx="18" cy="25" rx="12" ry="6" fill="currentColor"/><circle cx="31" cy="18" r="5" fill="currentColor"/><polygon points="27,15 28,6 32,13" fill="currentColor"/><polygon points="32,13 36,6 36,16" fill="currentColor"/><ellipse cx="36" cy="20" rx="3" ry="2" fill="currentColor"/><rect x="9" y="29" width="3" height="5" fill="currentColor"/><rect x="24" y="29" width="3" height="5" fill="currentColor"/><path d="M6 23 Q3 21 5 19" stroke="currentColor" stroke-width="2" fill="none"/>'};
 
 // Sleepyeye mark (placeholder — swap for the real one)
-const EYE='<svg viewBox="0 0 24 12" width="18" height="9" style="display:inline-block;vertical-align:middle;margin-right:5px"><path d="M2 3 Q12 11 22 3" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M6 7 L5 10 M12 8.5 L12 11.5 M18 7 L19 10" stroke="currentColor" stroke-width="1.3"/></svg>';
+const EYE='<svg viewBox="0 0 24 12" style="display:inline-block;vertical-align:middle;width:1.8em;height:.9em;margin-right:.5em"><path d="M2 3 Q12 11 22 3" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M6 7 L5 10 M12 8.5 L12 11.5 M18 7 L19 10" stroke="currentColor" stroke-width="1.3"/></svg>';
 
 // ---------- THE SCRAP BOX (edit these lists to add/remove material) ----------
 const POOLS={
@@ -87,15 +91,15 @@ function photo(){ // placeholder "photocopied photo" — later swap for real sca
   for(let i=0;i<k;i++){s+=`<rect x="${n(0,80)}" y="${n(0,60)}" width="${n(10,60)}" height="${n(6,40)}" fill="currentColor" opacity="${n(0.15,0.7).toFixed(2)}"/>`}
   const hz=n(25,55);s+=`<line x1="0" y1="${hz}" x2="100" y2="${hz+n(-8,8)}" stroke="currentColor" stroke-width="1.5"/>`;
   return `<svg viewBox="0 0 100 75" width="100%" style="display:block;background:var(--photo-bg)">${s}</svg>`}
-function sc(html,t,l,w,rot,fs,ex=""){return `<div class="sc" style="top:${t}%;left:${l}%;width:${w}%;transform:rotate(${rot}deg);font-size:${fs}px;${ex}">${html}</div>`}
+function sc(html,t,l,w,rot,fs,ex=""){return `<div class="sc" style="top:${t}%;left:${l}%;width:${w}%;transform:rotate(${rot}deg);font-size:${(fs/1.75).toFixed(2)}cqw;${ex}">${html}</div>`}
 function poem(){return [take("P1")+",",take("P2")+",",take("P2")+" —",take("P3")+".","",take("P4")].join("<br>")}
 
 function page(i,iss,k){let h="",room=true,cls="pg";
   if(i===0){ // COVER
     cls+=" cv";room=false;
-    h+=`<div style="position:absolute;top:0;left:0;right:0;background:var(--ink);color:var(--paper);padding:8px 6px 6px;text-align:center"><div style="font-size:9px;letter-spacing:2px">THE OFFICIAL BULLETIN OF THE</div><div style="font-size:15px;font-weight:500;letter-spacing:1px;line-height:1.1;margin-top:3px">POVERTY BAY PIONEERS CLUB</div></div>`;
+    h+=`<div style="position:absolute;top:0;left:0;right:0;background:var(--ink);color:var(--paper);padding:4.6cqw 3.4cqw 3.4cqw;text-align:center"><div style="font-size:5.1cqw;letter-spacing:.2em">THE OFFICIAL BULLETIN OF THE</div><div style="font-size:8.6cqw;font-weight:500;letter-spacing:.07em;line-height:1.1;margin-top:1.7cqw">POVERTY BAY PIONEERS CLUB</div></div>`;
     h+=sc(photo(),38,10,80,n(-6,6),11);
-    h+=sc("NO. "+iss,80,8,"auto",n(-8,-3),12,"font-weight:500;border:2px solid currentColor;padding:2px 6px;width:auto");
+    h+=sc("NO. "+iss,80,8,"auto",n(-8,-3),12,"font-weight:500;border:2px solid currentColor;padding:.15em .5em;width:auto");
     h+=sc("SLEEPYEYE PRESS",82,52,42,0,9,"text-align:right;letter-spacing:1px;color:var(--ink-2)")}
   else if(i===7){ // BACK COVER
     room=false;
@@ -106,7 +110,7 @@ function page(i,iss,k){let h="",room=true,cls="pg";
     if(k==="photo"){h+=sc(photo(),n(8,20),n(5,15),n(70,85),n(-8,8),11);h+=sc("<i>"+take("C")+"</i>",n(65,78),n(10,40),55,n(-4,4),11);room=false}
     if(k==="head"){h+=sc(take("H"),n(10,35),8,84,n(-6,6),n(16,22),"font-weight:500")}
     if(k==="line"){h+=sc(take("L"),n(15,45),n(8,15),75,n(-5,5),13)}
-    if(k==="ad"){h+=sc("CLASSIFIEDS",8,8,80,0,11,"border-bottom:1px solid currentColor");h+=sc(take("A"),26,8,82,n(-3,3),12,"border:1px dashed currentColor;padding:4px");h+=sc(take("A"),52,8,82,n(-3,3),12,"border:1px dashed currentColor;padding:4px");room=false}
+    if(k==="ad"){h+=sc("CLASSIFIEDS",8,8,80,0,11,"border-bottom:1px solid currentColor");h+=sc(take("A"),26,8,82,n(-3,3),12,"border:1px dashed currentColor;padding:.35em");h+=sc(take("A"),52,8,82,n(-3,3),12,"border:1px dashed currentColor;padding:.35em");room=false}
     if(k==="mix"){h+=sc(take("H"),n(4,12),8,84,n(-4,4),14,"font-weight:500");h+=sc(photo(),n(35,45),n(15,30),n(50,65),n(-10,10),11);room=false}
     if(k==="beast"){h+=sc(stamp(),n(14,24),n(18,30),n(45,60),n(-12,12),11);h+=sc(take("L"),n(68,74),8,80,n(-3,3),11);room=false}}
   if(room&&extra<1&&Math.random()<.3){extra++;h+=sc(stamp(),n(64,70),n(58,68),n(16,22),n(-15,15),11)} // max one extra corner stamp
@@ -120,7 +124,17 @@ function gen(){
   document.getElementById("z").innerHTML=o;
   document.getElementById("meta").textContent="Issue #"+iss;
 }
-document.getElementById("go").addEventListener("click",gen);gen();
+// size the 8 pages to fill the screen: 2x4 on tall screens, 4x2 on wide ones
+function fit(){
+  const z=document.getElementById("z"),st=document.getElementById("stage");
+  const W=st.clientWidth,H=st.clientHeight,g=Math.min(W,H)<500?6:10;let best=null;
+  for(const [c,r] of [[2,4],[4,2]]){
+    const w=Math.floor(Math.min((W-g*(c-1))/c,(H-g*(r-1))/r*3/4));
+    if(!best||w>best.w)best={c,w}}
+  z.style.gap=g+"px";z.style.gridTemplateColumns=`repeat(${best.c},${best.w}px)`}
+addEventListener("resize",fit);
+if(window.visualViewport)visualViewport.addEventListener("resize",fit);
+document.getElementById("go").addEventListener("click",gen);gen();fit();
 </script>
 </body>
 </html>
