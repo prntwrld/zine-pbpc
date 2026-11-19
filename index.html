@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Poverty Bay Pioneers Club — Official Bulletin</title>
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#ffffff; --ink:#1a1a18; --ink-2:#5f5e5a; --ink-3:#9a9891;
+  --page-bg:#f1efe8; --photo-bg:#e6e4dc; --rule:#b4b2a9;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --serif:Georgia,"Times New Roman",serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --paper:#262624; --ink:#ecebe6; --ink-2:#b4b2a9; --ink-3:#888780;
+         --page-bg:#1a1a18; --photo-bg:#33332f; --rule:#5f5e5a; }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page-bg);color:var(--ink);font-family:var(--mono)}
+main{max-width:760px;margin:0 auto;padding:24px 16px 48px}
+.bar{display:flex;align-items:center;gap:12px;margin:0 0 16px}
+button{font:inherit;font-size:14px;color:var(--ink);background:transparent;border:1px solid var(--ink-2);border-radius:8px;padding:8px 14px;cursor:pointer}
+button:active{transform:scale(.98)}
+#meta{font-size:13px;color:var(--ink-2)}
+.zg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (min-width:640px){.zg{grid-template-columns:repeat(4,minmax(0,1fr))}}
+.pg{position:relative;aspect-ratio:3/4;background:var(--paper);border:1px solid var(--rule);overflow:hidden;color:var(--ink)}
+.cv{border:3px double var(--ink)}
+.pn{position:absolute;bottom:4px;right:6px;font-size:11px;color:var(--ink-3)}
+.sc{position:absolute;line-height:1.2}
+@media print{.bar{display:none}body{background:#fff}}
+</style>
+</head>
+<body>
+<main>
+<div class="bar">
+  <button id="go">↻ New issue</button>
+  <span id="meta"></span>
+</div>
+<div class="zg" id="z"></div>
+</main>
+<script>
+// ---------- STAMPS (simple silhouettes, 40x40) ----------
+const M={
+lighthouse:'<polygon points="15,37 25,37 23,13 17,13" fill="currentColor"/><rect x="16" y="8" width="8" height="5" fill="currentColor"/><polygon points="15,8 25,8 20,3" fill="currentColor"/><line x1="25" y1="10" x2="38" y2="6" stroke="currentColor"/><line x1="15" y1="10" x2="2" y2="6" stroke="currentColor"/>',
+heron:'<ellipse cx="23" cy="18" rx="8" ry="4" fill="currentColor"/><path d="M16 17 Q12 9 17 6 L9 8" stroke="currentColor" stroke-width="2" fill="none"/><line x1="22" y1="22" x2="20" y2="37" stroke="currentColor" stroke-width="1.5"/><line x1="25" y1="22" x2="27" y2="37" stroke="currentColor" stroke-width="1.5"/>',
+bat:'<path d="M3 16 Q10 9 14 16 Q17 11 20 14 Q23 11 26 16 Q30 9 37 16 Q31 18 29 25 Q25 20 20 23 Q15 20 11 25 Q9 18 3 16Z" fill="currentColor"/>',
+raccoon:'<polygon points="11,14 14,5 18,12" fill="currentColor"/><polygon points="29,14 26,5 22,12" fill="currentColor"/><ellipse cx="20" cy="21" rx="12" ry="10" fill="currentColor"/><rect x="9" y="17" width="22" height="5" rx="2" fill="var(--paper)"/><circle cx="15" cy="19.5" r="1.6" fill="currentColor"/><circle cx="25" cy="19.5" r="1.6" fill="currentColor"/>',
+deer:'<ellipse cx="18" cy="24" rx="11" ry="5" fill="currentColor"/><path d="M27 22 L31 12" stroke="currentColor" stroke-width="3"/><ellipse cx="32" cy="11" rx="4" ry="2.5" fill="currentColor"/><path d="M31 9 L28 3 M31 9 L34 3 M29 6 L26 5 M33 6 L37 5" stroke="currentColor" fill="none"/><path d="M11 28 L10 37 M15 28 L15 37 M22 28 L22 37 M26 27 L27 37" stroke="currentColor" stroke-width="1.5"/>',
+driftwood:'<path d="M2 25 Q12 19 22 23 T38 21 L38 27 Q28 30 20 28 T2 30Z" fill="currentColor"/><path d="M30 22 L35 15" stroke="currentColor" stroke-width="2"/>',
+ferry:'<path d="M3 26 L37 26 L33 32 L7 32Z" fill="currentColor"/><rect x="9" y="19" width="22" height="7" fill="currentColor"/><rect x="14" y="13" width="12" height="6" fill="currentColor"/><path d="M3 35 Q8 33 13 35 T23 35 T37 35" stroke="currentColor" fill="none"/>',
+tahoma:'<polygon points="2,34 20,8 38,34" fill="currentColor"/><polygon points="14,17 20,8 26,17 23,15 20,18 17,15" fill="var(--paper)"/>',
+mushroom:'<path d="M7 21 Q20 3 33 21Z" fill="currentColor"/><rect x="17" y="21" width="6" height="13" fill="currentColor"/><line x1="4" y1="34" x2="36" y2="34" stroke="currentColor"/>',
+fern:'<path d="M20 37 Q22 20 16 4" stroke="currentColor" stroke-width="1.5" fill="none"/><path d="M21 32 L29 29 M21 27 L28 23 M20 22 L26 17 M19 17 L24 12 M21 32 L13 29 M21 27 L13 24 M20 22 L13 18 M18 17 L13 13" stroke="currentColor" stroke-width="1.5"/>',
+corgi:'<ellipse cx="18" cy="25" rx="12" ry="6" fill="currentColor"/><circle cx="31" cy="18" r="5" fill="currentColor"/><polygon points="27,15 28,6 32,13" fill="currentColor"/><polygon points="32,13 36,6 36,16" fill="currentColor"/><ellipse cx="36" cy="20" rx="3" ry="2" fill="currentColor"/><rect x="9" y="29" width="3" height="5" fill="currentColor"/><rect x="24" y="29" width="3" height="5" fill="currentColor"/><path d="M6 23 Q3 21 5 19" stroke="currentColor" stroke-width="2" fill="none"/>'};
+
+// Sleepyeye mark (placeholder — swap for the real one)
+const EYE='<svg viewBox="0 0 24 12" width="18" height="9" style="display:inline-block;vertical-align:middle;margin-right:5px"><path d="M2 3 Q12 11 22 3" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M6 7 L5 10 M12 8.5 L12 11.5 M18 7 L19 10" stroke="currentColor" stroke-width="1.3"/></svg>';
+
+// ---------- THE SCRAP BOX (edit these lists to add/remove material) ----------
+const POOLS={
+// Headlines
+H:["MEMBERSHIP REMAINS AT ONE","TIDE OUT, SPIRITS UP","DASH POINT: A REPORT","THE FERRY DID NOT COME","FOG ADVISORY FOR THE SOUL","BEAVER SIGHTED NEAR REDONDO","MARINE VIEW DRIVE, AGAIN","MINUTES OF THE LAST MEETING","WHO OWNS THE TIDEFLATS","RAIN: A FIELD GUIDE","RACCOON CONVENTION ENTERS DAY THREE","THE MOUNTAIN IS OUT","AGENDA ITEM 4: THE FOG","LOCAL HERON FILES NO COMPLAINT","BROWNS POINT HOLDS STEADY","HIGH TIDE, LOWER EXPECTATIONS","DRIZZLE ENTERS FOURTH MONTH","PUBLIC COMMENT PERIOD: GULLS ONLY","THE BRIDGE GOES UP, THE BRIDGE COMES DOWN","REDONDO: STILL THERE","AN EVENING ON THE PIER, DOCUMENTED","IT'S ALWAYS RAINING","MUSHROOM SEASON DECLARED","MARINERS: THERE IS ALWAYS NEXT YEAR"],
+// One-liners
+L:["Quorum achieved. Quorum was me.","Motion to adjourn to the beach. Seconded by a gull.","The bay has been called poor. We disagree.","Bring a thermos. Bring two.","Low tide at 6:12. Show up.","The pier remembers you.","Treasurer's report: one (1) smooth rock.","Nobody asked. We answered anyway.","Overheard at the bus stop: 'it's not raining, it's just wet.'","The bats are doing their rounds. Let them work.","Driftwood: free furniture, poor seating.","Minutes approved as read. They were not read.","The tide came in. Then, inexplicably, it went out.","Attendance was strong (1).","A barnacle has requested standing.","The secretary notes the rain. The treasurer notes it too. Same guy.","No new business. The old business is also the bay.","Members are reminded the sun exists. Evidence pending.","Meeting called to order by a foghorn.","The view remains available to all residents. No reservation required.","A deer was observed observing us back.","The bats left early. We respect that.","Wind from the south. Opinions from the north.","The sergeant-at-arms declined the walk. Motion tabled.","Jasper was asked what he was making. He snarled. Noted.","A chanterelle was found. Its location will not be published.","The club does not meet Saturdays."],
+// Classifieds
+A:["FOR SALE: one kayak, slightly haunted.","WANTED: a member #2.","LOST: my sense of direction, near Federal Way.","FREE: unlimited moss. You haul.","SEEKING: beaver dam inspector, no experience.","SEEKING: raccoon who took my sandwich. No hard feelings.","WANTED: someone to agree the light was nice today.","FREE: one (1) gull feather, gently used.","FOR TRADE: one sunny afternoon, mint condition, seeking two.","LOST: an umbrella, again. Do not return; it knows what it did.","SEEKING: ferry schedule that means it.","ROOM FOR RENT: driftwood fort, ocean view, no walls.","WANTED: one (1) leash a corgi will respect.","FOR SALE: nothing. Everything here is being preserved."],
+// Photo captions
+C:["tideflats, 6am","pier pilings","the hill above Redondo","a heron, unimpressed","fog over the bay","rust on a railing","low tide, Dash Point","the steps down to the beach","a raccoon, mid-plan","ferry wake","streetlight in the mist","moss, thriving","Point Defiance, from the passenger window"],
+// Commencement poem parts: where / images / turn / closing / sign-off
+P1:["At the end of the pier","In the lot after the rain","Past the last streetlight","Under the bridge, mid-lift","On the stairs to the beach","Between one ferry and the next","Behind the closed bait shop"],
+P2:["the water keeps its own minutes","a heron holds the shape of waiting","the sodium lights hum about almost","moss takes the stairs one at a time","the tide erases what it wrote","the fog rehearses being a city","a gull audits the empty benches","the mountain declines to appear","the hallway of the evening stays lit","the smelter stack is a missing tooth"],
+P3:["and I thought this was the beginning","nobody said the ceremony would be this quiet","we were promised a procession","somewhere a diploma is getting wet","I waited to be called by name","the program listed no speakers"],
+P4:["Commence, the bay says, and does not move.","Begin, it says. Begin again.","Everyone is graduating from something.","The tassel turns. The tide does too.","We file out into the gray, unhurried.","It starts here. It also ends here."],
+SO:["— entered into the record, 1–0","— filed at low tide","— read aloud to no one, Tuesday","— composed during a foghorn","— approved without objection","— written on a napkin, Redondo","— submitted late, accepted anyway","— the secretary, in the rain"],
+S:Object.keys(M)};
+
+// ---------- ENGINE ----------
+const shuf=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+let D={},extra=0;
+const take=k=>{if(!D[k]||!D[k].length)D[k]=shuf(POOLS[k]);return D[k].pop()}; // deal without repeats
+const n=(a,b)=>a+Math.random()*(b-a);
+const stamp=()=>`<svg viewBox="0 0 40 40" width="100%" style="display:block">${M[take("S")]}</svg>`;
+function photo(){ // placeholder "photocopied photo" — later swap for real scans
+  const k=Math.floor(n(3,7));let s="";
+  for(let i=0;i<k;i++){s+=`<rect x="${n(0,80)}" y="${n(0,60)}" width="${n(10,60)}" height="${n(6,40)}" fill="currentColor" opacity="${n(0.15,0.7).toFixed(2)}"/>`}
+  const hz=n(25,55);s+=`<line x1="0" y1="${hz}" x2="100" y2="${hz+n(-8,8)}" stroke="currentColor" stroke-width="1.5"/>`;
+  return `<svg viewBox="0 0 100 75" width="100%" style="display:block;background:var(--photo-bg)">${s}</svg>`}
+function sc(html,t,l,w,rot,fs,ex=""){return `<div class="sc" style="top:${t}%;left:${l}%;width:${w}%;transform:rotate(${rot}deg);font-size:${fs}px;${ex}">${html}</div>`}
+function poem(){return [take("P1")+",",take("P2")+",",take("P2")+" —",take("P3")+".","",take("P4")].join("<br>")}
+
+function page(i,iss,k){let h="",room=true,cls="pg";
+  if(i===0){ // COVER
+    cls+=" cv";room=false;
+    h+=`<div style="position:absolute;top:0;left:0;right:0;background:var(--ink);color:var(--paper);padding:8px 6px 6px;text-align:center"><div style="font-size:9px;letter-spacing:2px">THE OFFICIAL BULLETIN OF THE</div><div style="font-size:15px;font-weight:500;letter-spacing:1px;line-height:1.1;margin-top:3px">POVERTY BAY PIONEERS CLUB</div></div>`;
+    h+=sc(photo(),38,10,80,n(-6,6),11);
+    h+=sc("NO. "+iss,80,8,"auto",n(-8,-3),12,"font-weight:500;border:2px solid currentColor;padding:2px 6px;width:auto");
+    h+=sc("SLEEPYEYE PRESS",82,52,42,0,9,"text-align:right;letter-spacing:1px;color:var(--ink-2)")}
+  else if(i===7){ // BACK COVER
+    room=false;
+    if(Math.random()<.5){h+=sc(photo(),n(22,34),n(22,32),n(40,50),n(-8,8),11)}else{h+=sc(stamp(),n(26,36),n(32,40),n(22,30),n(-10,10),11)}
+    h+=sc(EYE+"sleepyeye press",86,8,82,0,10,"text-align:right;letter-spacing:1px;color:var(--ink-2)")}
+  else{ // INSIDE PAGES
+    if(k==="poem"){room=false;h+=sc("Commencement",9,10,80,0,16,"font-family:'UnifrakturMaguntia',serif;color:var(--ink-2)");h+=sc("",21,10,22,0,11,"border-top:1px solid currentColor");h+=sc(poem(),26,10,82,0,10,"font-family:var(--serif);font-style:italic;line-height:1.5");h+=sc(take("SO"),80,10,80,0,9,"color:var(--ink-2)")}
+    if(k==="photo"){h+=sc(photo(),n(8,20),n(5,15),n(70,85),n(-8,8),11);h+=sc("<i>"+take("C")+"</i>",n(65,78),n(10,40),55,n(-4,4),11);room=false}
+    if(k==="head"){h+=sc(take("H"),n(10,35),8,84,n(-6,6),n(16,22),"font-weight:500")}
+    if(k==="line"){h+=sc(take("L"),n(15,45),n(8,15),75,n(-5,5),13)}
+    if(k==="ad"){h+=sc("CLASSIFIEDS",8,8,80,0,11,"border-bottom:1px solid currentColor");h+=sc(take("A"),26,8,82,n(-3,3),12,"border:1px dashed currentColor;padding:4px");h+=sc(take("A"),52,8,82,n(-3,3),12,"border:1px dashed currentColor;padding:4px");room=false}
+    if(k==="mix"){h+=sc(take("H"),n(4,12),8,84,n(-4,4),14,"font-weight:500");h+=sc(photo(),n(35,45),n(15,30),n(50,65),n(-10,10),11);room=false}
+    if(k==="beast"){h+=sc(stamp(),n(14,24),n(18,30),n(45,60),n(-12,12),11);h+=sc(take("L"),n(68,74),8,80,n(-3,3),11);room=false}}
+  if(room&&extra<1&&Math.random()<.3){extra++;h+=sc(stamp(),n(64,70),n(58,68),n(16,22),n(-15,15),11)} // max one extra corner stamp
+  return `<div class="${cls}">${h}<span class="pn">${i+1}</span></div>`}
+
+function gen(){
+  D={};extra=0;
+  const iss=Math.floor(n(1,400));
+  const types=shuf(["poem",...shuf(["photo","head","line","ad","mix","beast"]).slice(0,5)]);
+  let o=page(0,iss);for(let i=1;i<7;i++)o+=page(i,iss,types[i-1]);o+=page(7,iss);
+  document.getElementById("z").innerHTML=o;
+  document.getElementById("meta").textContent="Issue #"+iss;
+}
+document.getElementById("go").addEventListener("click",gen);gen();
+</script>
+</body>
+</html>
